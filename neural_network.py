@@ -1,6 +1,7 @@
 from sklearn.datasets import fetch_openml
 import pandas as pd
 import numpy as np
+import cv2
 
 np.random.seed(0)
 NEURAL_SHAPE = [784, 16, 16, 10]
@@ -32,7 +33,24 @@ def get_biases(neural_shape):
     biases = biases + [np.random.rand(n) for n in neural_shape[1:]]
     return biases
 
+### Convert row of MNIST DataFrame into 28x28 NumPy array
+def get_image(series):
+    im = np.zeros((28, 28), dtype=np.uint8)
+    px = 1
+    for i in range(28):
+        for j in range(28):
+            im[i, j] = series[f"pixel{px}"]
+            px += 1
+    return im
+
+def display_image(im):
+    im_display = cv2.resize(im, (224, 224))
+    cv2.imshow("im", im_display)
+    cv2.waitKey()
+
+# Load dataset
 data, target = load_dataset()
+
 # Define training and testing datapoints
 data_training = data[:60000]
 target_training = target[:60000]
@@ -43,5 +61,3 @@ target_testing = target[60000:70000]
 # Initialize weights and biases
 weights = get_weights(NEURAL_SHAPE)
 biases = get_biases(NEURAL_SHAPE)
-
-print(weights[1:], biases[1:])
